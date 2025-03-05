@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from 'react';
 
 // Transmutation Spells from the document
 const transmutationSpells = [
@@ -109,10 +109,10 @@ const transmutationMaterials = [
 ];
 
 const TransmutationSpellSelector = () => {
-  const [selectedSpell, setSelectedSpell] = useState(null);
-  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [selectedSpell, setSelectedSpell] = useState<{ name: string; properties: string[]; materials: string[]; description: string; } | null>(null);
+  const [availableMaterials, setAvailableMaterials] = useState<{ name: string; properties: string[]; effect: string; }[]>([]);
 
-  const findMatchingMaterials = (spell) => {
+  const findMatchingMaterials = (spell: { name: string; properties: string[]; materials: string[]; description: string; } | null | undefined) => {
     if (!spell) return [];
 
     return transmutationMaterials.filter(material => 
@@ -120,8 +120,8 @@ const TransmutationSpellSelector = () => {
     );
   };
 
-  const handleSpellChange = (spellName) => {
-    const spell = transmutationSpells.find(s => s.name === spellName);
+  const handleSpellChange = (spellName: string) => {
+    const spell = transmutationSpells.find(s => s.name === spellName) || null;
     setSelectedSpell(spell);
     setAvailableMaterials(findMatchingMaterials(spell));
   };
@@ -155,7 +155,7 @@ const TransmutationSpellSelector = () => {
               <div className="mb-2">
                 <strong>Spell Properties:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedSpell.properties.map(prop => (
+                  {selectedSpell.properties.map((prop: string) => (
                     <Badge key={prop} variant="secondary">{prop}</Badge>
                   ))}
                 </div>
@@ -164,8 +164,8 @@ const TransmutationSpellSelector = () => {
               <div className="mb-2">
                 <strong>Required Materials:</strong>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedSpell.materials.map(mat => (
-                    <Badge key={mat} variant="outline">{mat}</Badge>
+                  {selectedSpell.materials.map((mat: boolean | React.Key | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined) => (
+                    <Badge key={String(mat)} variant="outline">{mat}</Badge>
                   ))}
                 </div>
               </div>
@@ -181,8 +181,8 @@ const TransmutationSpellSelector = () => {
                           <p className="text-sm text-gray-600">{material.effect}</p>
                         </div>
                         <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {material.properties.map(prop => (
-                            <Badge key={prop} variant="secondary" className="text-xs">{prop}</Badge>
+                          {material.properties.map((prop) => (
+                            <Badge key={String(prop)} variant="secondary" className="text-xs">{prop}</Badge>
                           ))}
                         </div>
                       </div>
