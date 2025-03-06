@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nuadha smells like doo doo farts",
-  description: "KILL FRIEDL",
+  title: "We casting up in this bish",
+  description: "I LOVE FRIEDL <3",
 };
 
 export default function RootLayout({
