@@ -15,9 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Material, allMaterials } from "@/data/materials";
-import { Spell, conjurationSpells, geomancySpells, necromancySpells, spellsBySchool, transmutationSpells } from "@/data/spellData";
-import { useEffect, useState } from "react";
+import { Spell, spellsBySchool } from "@/data/spellData";
+
+import confetti from "canvas-confetti";
+import { useEffect, useRef, useState } from "react";
 
 export default function AlchemySpellSelector() {
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
@@ -25,7 +28,14 @@ export default function AlchemySpellSelector() {
   const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Dark Mode effect remains the same
+  // Easter Egg State
+  const [gnomed, setGnomed] = useState(false);
+
+  // We have two audio refs for two different sounds
+  const audioRef1 = useRef<HTMLAudioElement>(null);
+  const audioRef2 = useRef<HTMLAudioElement>(null);
+
+  // Toggle Dark Mode
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -34,7 +44,7 @@ export default function AlchemySpellSelector() {
     }
   }, [darkMode]);
 
-  // Update findMatchingMaterials to use Material and Spell types
+  // Finds materials that share a property with the chosen spell
   const findMatchingMaterials = (spell: Spell | null, school: string | null) => {
     if (!spell || !school) return [];
     return allMaterials.filter((material) =>
@@ -42,20 +52,14 @@ export default function AlchemySpellSelector() {
     );
   };
 
-  // Rest of your component remains the same, but we'll define spellsBySchool here
-  const schools: Record<string, Spell[]> = {
-    Transmutation: transmutationSpells,
-    Conjuration: conjurationSpells,
-    Geomancy: geomancySpells,
-    Necromancy: necromancySpells,
-  };
-
+  // Handle School selection
   const handleSchoolChange = (schoolName: string) => {
     setSelectedSchool(schoolName);
     setSelectedSpell(null);
     setAvailableMaterials([]);
   };
 
+  // Handle Spell selection
   const handleSpellChange = (spellName: string) => {
     if (!selectedSchool) return;
     const spells = spellsBySchool[selectedSchool] || [];
@@ -66,9 +70,33 @@ export default function AlchemySpellSelector() {
       setAvailableMaterials([]);
       return;
     }
-    // Gather matching materials from the unified list
+    // Gather matching materials
     const matching = findMatchingMaterials(spell, selectedSchool);
     setAvailableMaterials(matching);
+  };
+
+  // Easter egg button: confetti + image + two sounds
+  const handleGnomedClick = () => {
+    // 1) Confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+
+    // 2) Show gnome image
+    setGnomed(true);
+
+    // 3) Play first audio
+    if (audioRef1.current) {
+      audioRef1.current.currentTime = 0;
+      audioRef1.current.play().catch((err) => console.error(err));
+    }
+    // 4) Play second audio
+    if (audioRef2.current) {
+      audioRef2.current.currentTime = 0;
+      audioRef2.current.play().catch((err) => console.error(err));
+    }
   };
 
   return (
@@ -127,7 +155,9 @@ export default function AlchemySpellSelector() {
             {/* 3) Show Spell Details + Materials */}
             {selectedSpell && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">{selectedSpell.name}</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  {selectedSpell.name}
+                </h3>
 
                 <p className="text-sm font-medium mb-1">
                   <strong>Focus:</strong> {selectedSpell.focus}
@@ -168,11 +198,10 @@ export default function AlchemySpellSelector() {
                       // Show the effect for whichever school is chosen
                       const effectForSchool =
                         selectedSchool &&
-                        (selectedSchool === "Transmutation" ||
-                          selectedSchool === "Conjuration"
-                          || selectedSchool === "Geomancy"
-                          || selectedSchool === "Necromancy")
-                          ? material.effects[selectedSchool]
+                        ["Transmutation", "Conjuration", "Geomancy", "Necromancy"].includes(
+                          selectedSchool
+                        )
+                          ? material.effects[selectedSchool as keyof typeof material.effects]
                           : "No effect listed.";
 
                       return (
@@ -213,6 +242,31 @@ export default function AlchemySpellSelector() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Easter Egg Button */}
+      <div className="text-center mt-8">
+        <button
+          onClick={handleGnomedClick}
+          className="text-xs text-gray-500 hover:underline"
+        >
+          gnomed
+        </button>
+      </div>
+
+      {/* Two hidden audio elements for the easter egg */}
+      <audio ref={audioRef1} src="/gnome-sound1.mp3" />
+      <audio ref={audioRef2} src="/gnome-sound2.mp3" />
+
+      {/* If gnomed, show the image */}
+      {gnomed && (
+        <div className="flex justify-center mt-4">
+          <img
+            src="/gnome-image.png"
+            alt="You got gnomed!"
+            className="max-w-xs"
+          />
+        </div>
+      )}
     </div>
   );
 }
