@@ -413,6 +413,20 @@ export const allMaterials = [
     },
   },
   {
+    name: "Silver",
+    properties: ["Feminine", "Adulthood", "Melancholic", "Celestial", "Winter", "Cold"],
+    effects: {
+      Transmutation:
+        "Cleanse chill buildup by 100 or if the target is already chilled, cleanse the condition itself when using a buffing spell. ",
+      Conjuration:
+        " Give your attack 140 chill application or increase its chill application by 50%.",
+      Geomancy:
+        "Everyone that is within your geomancy construct gains 75 chill buildup per turn.",
+      Necromancy:
+        "Any corpse you use gives 100 chill buildup to everyone that is within corpse explosion range.",
+    },
+  },
+  {
     name: "Soap",
     properties: ["Wet", "Feminine", "Phlegm", "Phlegmatic", "Spleen", "Supine"],
     effects: {
